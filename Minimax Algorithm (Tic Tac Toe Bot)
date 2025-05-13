@@ -1,0 +1,62 @@
+import math
+
+def print_board(board):
+    for row in board:
+        print(" | ".join(row))
+        print("-"*5)
+
+def is_winner(board, player):
+    for row in board:
+        if all(cell == player for cell in row):
+            return True
+    for col in range(3):
+        if all(row[col] == player for row in board):
+            return True
+    if all(board[i][i] == player for i in range(3)) or \
+       all(board[i][2-i] == player for i in range(3)):
+        return True
+    return False
+
+def is_draw(board):
+    return all(cell != ' ' for row in board for cell in row)
+
+def minimax(board, depth, is_max):
+    if is_winner(board, 'O'):
+        return 1
+    elif is_winner(board, 'X'):
+        return -1
+    elif is_draw(board):
+        return 0
+
+    if is_max:
+        best = -math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == ' ':
+                    board[i][j] = 'O'
+                    best = max(best, minimax(board, depth+1, False))
+                    board[i][j] = ' '
+        return best
+    else:
+        best = math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == ' ':
+                    board[i][j] = 'X'
+                    best = min(best, minimax(board, depth+1, True))
+                    board[i][j] = ' '
+        return best
+
+def best_move(board):
+    best_val = -math.inf
+    move = (-1, -1)
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == ' ':
+                board[i][j] = 'O'
+                move_val = minimax(board, 0, False)
+                board[i][j] = ' '
+                if move_val > best_val:
+                    best_val = move_val
+                    move = (i, j)
+    return move
